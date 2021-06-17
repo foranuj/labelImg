@@ -53,6 +53,14 @@ class LabelFile(object):
                                 imageShape, shapes, outputFile, localimgpath=imagePath)
         writer.verified = self.verified
         writer.write()
+        import json
+        print("Writing to some filename ", filename)
+        with open(filename  + ".json", 'w') as f:
+            json.dump(dict(
+                shapes=shapes,
+                imagePath=imagePath),
+                f)
+
 
 
     def savePascalVocFormat(self, filename, shapes, imagePath, imageData,
@@ -80,7 +88,15 @@ class LabelFile(object):
             # Add Chris
             difficult = int(shape['difficult'])
             bndbox = LabelFile.convertPoints2BndBox(points)
+            shape['bndbox'] = bndbox
             writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
+
+        import json
+        with open(filename + ".json", 'w') as f:
+            json.dump(dict(
+                shapes=shapes,
+                imagePath=imagePath),
+                f)
 
         writer.save(targetFile=filename)
         return
@@ -110,9 +126,19 @@ class LabelFile(object):
             # Add Chris
             difficult = int(shape['difficult'])
             bndbox = LabelFile.convertPoints2BndBox(points)
+            shape['bndbox'] = bndbox
             writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
 
         writer.save(targetFile=filename, classList=classList)
+
+        import json
+        with open(filename  + ".json", 'w') as f:
+            json.dump(dict(
+                shapes=shapes,
+                lineColor=lineColor, fillColor=fillColor,
+                imagePath=imagePath),
+                f)
+
         return
 
     def toggleVerify(self):
@@ -175,4 +201,4 @@ class LabelFile(object):
         if ymin < 1:
             ymin = 1
 
-        return (int(xmin), int(ymin), int(xmax), int(ymax))
+        return int(xmin), int(ymin), int(xmax), int(ymax)
